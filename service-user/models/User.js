@@ -33,12 +33,16 @@ module.exports=(sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: true
           },
+          token : {
+            type : DataTypes.TEXT,
+            allowNull: false
+          },
           createdAt:{
-            field: "created_ad",
+            field: "created_at",
             type: DataTypes.DATE
           },
           updatedAt:{
-            field: "updated_ad",
+            field: "updated_at",
             type: DataTypes.DATE,
             allowNull: true
           },
