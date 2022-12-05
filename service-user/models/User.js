@@ -35,7 +35,7 @@ module.exports=(sequelize, DataTypes) => {
           },
           token : {
             type : DataTypes.TEXT,
-            allowNull: false
+            allowNull: true
           },
           createdAt:{
             field: "created_at",

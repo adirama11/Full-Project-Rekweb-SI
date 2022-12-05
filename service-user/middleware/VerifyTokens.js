@@ -1,8 +1,8 @@
 const jwt = require('jsonwebtoken')
 
 module.exports = async(req, res, next) => {
-    const authHeader = req.headers['autorization']
-    const token = authHeader && authHeader.split(' ')[1]
+    const authHeader = req.headers['autorization'];
+    const token = authHeader && authHeader.split(' ')[1];
     if (token == null){
         return res.status(401).json({
             status : 'error in jwt',
@@ -18,7 +18,7 @@ module.exports = async(req, res, next) => {
             })
         }
 
-        req.username = decoded.username
+        req.email = decoded.email
         next()
     });
 }

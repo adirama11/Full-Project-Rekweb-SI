@@ -1,10 +1,12 @@
 const { User } = require("../../../models");
 const Validator= require('fastest-validator');
+const jwt = require('jsonwebtoken');
 const v = new Validator ();
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcrypt');
 
 module.exports = async (req, res) => {
-    const schema = {
+    try {
+        const schema = {
         email : "string | empty:false",
         pass  : "string | min:6",
     };
@@ -12,41 +14,74 @@ module.exports = async (req, res) => {
     const validate = v.validate(req.body, schema);
 
     if (validate.length){
-        return res.status(200).json({
+        return res.status(400).json({
             status: "error",
             message: validate,
         });
     }
 
-    const user = await User.findOne({
+    const user = await User.findAll({
         where:{email: req.body.email}
     });
 
     if (!user){
-        return res.status(200).json({
+        return res.status(404).json({
             status: 'error',
             message: 'User not found'
         });
     }
-    const invalidPassword = await bcrypt.compare(req.body.pass, user.pass);
+    const validPassword = await bcrypt.compare(req.body.pass, user[0].pass);
 
-    if (!invalidPassword){
-        return res.status(200).json({
+    if (!validPassword){
+        return res.status(400).json({
             status: 'error',
-            message: 'User not foundd'
+            message: 'Password failed'
         });
     }
 
-    return res.status(200).json({
-        status: "succes",
-        message: {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
-            avatar: user.avatar,
-            profession: user.profession
-        }
+    const idUser = user[0].id;
+    const name = user[0].name;
+    const profesi = user[0].profession;
+    const role = user[0].role;
+    const email = user[0].email;
+
+
+    const accesToken = jwt.sign({idUser, name, profesi, role, email }, process.env.ACCES_TOKEN_SECRET, {
+        expiresIn : '30s'
     });
+
+    const refreshToken = jwt.sign({idUser, name, profesi, role, email}, process.env.REFRESH_ACCES_TOKEN_SECRET, {
+        expiresIn: '15s'
+    });
+
+    await User.update({token : refreshToken},{
+        where: {
+            id : idUser
+        } });
+    res.cookie('refresh token', refreshToken, {
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000
+    });
+
+    return res.status(200).json({
+        status : 'OK!',
+        message: accesToken
+    })
+    }catch(error){
+        console.log(error);
+    }
+
+    
+    // return res.status(200).json({
+    //     status: "succes",
+    //     message: {
+    //         id: user.id,
+    //         name: user.name,
+    //         email: user.email,
+    //         role: user.role,
+    //         avatar: user.avatar,
+    //         profession: user.profession
+    //     }
+    // });
     
 }
