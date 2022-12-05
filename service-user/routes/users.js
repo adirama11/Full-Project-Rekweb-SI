@@ -9,7 +9,7 @@ router.post('/register', userHandler.register);
 router.post('/login', userHandler.login);
 router.put('/update/:id', userHandler.update);
 router.get('/user/:id', userHandler.userById);
-router.get('/', userHandler.getUsers);
+router.get('/',verify, userHandler.getUsers);
 router.delete('/delete/:id', userHandler.delUser);
 
 module.exports = router;
