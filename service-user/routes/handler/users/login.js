@@ -47,11 +47,11 @@ module.exports = async (req, res) => {
 
 
     const accesToken = jwt.sign({idUser, name, profesi, role, email }, process.env.ACCES_TOKEN_SECRET, {
-        expiresIn : '30s'
+        expiresIn : '120s'
     });
 
     const refreshToken = jwt.sign({idUser, name, profesi, role, email}, process.env.REFRESH_ACCES_TOKEN_SECRET, {
-        expiresIn: '15s'
+        expiresIn: '60s'
     });
 
     await User.update({token : refreshToken},{

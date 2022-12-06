@@ -4,7 +4,7 @@ module.exports = async (req, res, next) => {
 
    
     const users = await User.findAll({
-        attributes: ['id', 'name', 'role', 'profession', 'avatar']
+        attributes: ['id', 'name', 'role', 'profession', 'avatar', 'token']
     });
 
     return  res.status(200).json({
