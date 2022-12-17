@@ -20,7 +20,7 @@ module.exports = async (req, res) => {
         });
     }
 
-    const user = await User.findAll({
+    const user = await User.findOne({
         where:{email: req.body.email}
     });
 
@@ -30,7 +30,7 @@ module.exports = async (req, res) => {
             message: 'User not found'
         });
     }
-    const validPassword = await bcrypt.compare(req.body.pass, user[0].pass);
+    const validPassword = await bcrypt.compare(req.body.pass, user.pass);
 
     if (!validPassword){
         return res.status(400).json({
@@ -39,19 +39,19 @@ module.exports = async (req, res) => {
         });
     }
 
-    const idUser = user[0].id;
-    const name = user[0].name;
-    const profesi = user[0].profession;
-    const role = user[0].role;
-    const email = user[0].email;
+    const idUser = user.id;
+    const name = user.name;
+    const profesi = user.profession;
+    const role = user.role;
+    const email = user.email;
 
 
     const accesToken = jwt.sign({idUser, name, profesi, role, email }, process.env.ACCES_TOKEN_SECRET, {
-        expiresIn : '120s'
+        expiresIn : '360s'
     });
 
     const refreshToken = jwt.sign({idUser, name, profesi, role, email}, process.env.REFRESH_ACCES_TOKEN_SECRET, {
-        expiresIn: '60s'
+        expiresIn: '1d'
     });
 
     await User.update({token : refreshToken},{
